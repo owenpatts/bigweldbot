@@ -1,2 +1,2 @@
 # bigweldbot
-Discord bot for persona use
+Discord bot for personal use
