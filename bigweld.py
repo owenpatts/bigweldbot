@@ -4,8 +4,22 @@ import discord
 import datetime
 import csv
 import asyncio
+import os
+
+'''
+GENERAL INFORMATION:
 
 
+bigusers.csv indexing:
+
+    [0] = username
+    [1] = messages sent
+    [2] = commands sent
+    [3] = youtube links sent
+    [4] = twitch clips sent
+    [5] = ...
+
+'''
 
 def read_cfg(idx):
     with open("bigweld.cfg", "r") as t:
@@ -36,10 +50,36 @@ def retcsvfrom2d(givenlist):
     return out
 
 
-def useradd(usertag, users):
-    initinfo = [usertag, '0', '0']
+def sentmsg(usertag, users):
+    initinfo = [usertag, '1', '0', '0', '0']
     if not any(usertag in sublist for sublist in users):
         users.append(initinfo)
+    else:
+        for i in users:
+            if i[0] == usertag:
+                i[1] = str(int(i[1]) + 1)
+                break
+    return users
+
+
+def sentcmd(usertag, users):
+    for i in users:
+        if i[0] == usertag:
+            i[2] = str(int(i[2]) + 1)
+    return users
+
+
+def sentyt(usertag, users):
+    for i in users:
+        if i[0] == usertag:
+            i[3] = str(int(i[3]) + 1)
+    return users
+
+
+def senttwitch(usertag, users):
+    for i in users:
+        if i[0] == usertag:
+            i[4] = str(int(i[4]) + 1)
     return users
 
 
@@ -57,6 +97,16 @@ def biglog(logentry):
     global log
     log += logentry
     print(logentry)
+
+
+def bigchatlog(server, channel, user, message):
+    fileloc = "logs/" + server
+    filename = "logs/" + server + "/" + channel + ".txt"
+    if not os.path.exists(fileloc):
+        os.makedirs(fileloc)    
+    with open(filename, "a") as t:
+       t.write(str(datetime.datetime.now()) + " ["+ user + "] " + message + "\n")
+
 
 
 
@@ -89,7 +139,9 @@ async def on_message(message):
     user = message.author.display_name
     usertag = str(message.author.name)  + "#" + str(message.author.discriminator)
     userID = message.author.id
-    csvfile = useradd(usertag, usercsv)
+
+    csvfile = sentmsg(usertag, usercsv)
+    bigchatlog(message.guild.name, message.channel.name, usertag, content)
 
     try:
         command = get_command(content)
@@ -105,12 +157,14 @@ async def on_message(message):
             if command == "help":
                 #await channel.send(embed=help_embed)
                 await channel.send(help_embed.description)
+                sentcmd(usertag, usercsv)
             
 
 
             elif command == "say":
                 await message.delete()
                 await channel.send(content[7:])
+                sentcmd(usertag, usercsv)
 
 
 
@@ -118,24 +172,57 @@ async def on_message(message):
                 await message.delete()
                 yellphrase = "@everyone: \n" + content[8:].upper()
                 await channel.send(yellphrase)
+                sentcmd(usertag, usercsv)
 
 
 
             elif command == "judgement":
                 await message.delete()
                 await channel.send(user + " has judged you.",file=img_judgement)
+                sentcmd(usertag, usercsv)
             elif command == "wow":
                 await channel.send(file=img_wow)
+                sentcmd(usertag, usercsv)
             
 
 
             elif command == "stop":
                 bigwritelog()
+                sentcmd(usertag, usercsv)
 
+
+            elif command == "stats":
+                sentcmd(usertag, usercsv)
+                try:
+                    user = content.split(' ')[2]
+                    found = False
+                    for i in usercsv:
+                        if i[0] == user:
+                            found = True
+                            msgct = i[1]
+                            cmdct = i[2]
+                            ytct = i[3]
+                            twct = i[4]
+                    if found:
+                        await channel.send("```"+ user.split("#")[0] + " has sent:\n" + msgct + " messages\n" + cmdct + " commands\n" + ytct + " youtube videos & \n" + twct + " twitch clips```")
+
+                    else:
+                        if "#" in user:
+                            await channel.send("I couldn't find any stats for ``" + user + "``. Make sure you've used proper capitalization")
+                        else:
+                            await channel.send("You need to give me the full user tag.\n```diff\n- Usage: big user [user#1234]```")
+
+                except:
+                    await channel.send("That wasn't quite what I was expecting.\n```diff\n- Usage: big user [user#1234]```")
 
 
             else:
                 await channel.send("Sorry, I didn't quite catch that.  Please try a supported command.")
+        else:
+            if "youtube.com" in content or "youtu.be" in content:
+                sentyt(usertag, usercsv)
+            elif "clips.twitch.tv" in content:
+                senttwitch(usertag, usercsv)
 
 
 async def update():
