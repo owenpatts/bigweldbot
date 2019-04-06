@@ -34,3 +34,6 @@
 2019-04-06 18:01:43.563981 : Owen#3629 (137712258280062976) Tried 'say'
 2019-04-06 18:18:06.529578 : Owen#3629 (137712258280062976) Tried 'test'
 2019-04-06 18:18:38.493039 : Owen#3629 (137712258280062976) Tried 'judgement'
+2019-04-06 18:26:42.847323 : Owen#3629 (137712258280062976) Tried 'help in Testing Grounds/bigwelds-workshop
+2019-04-06 18:26:45.235732 : Owen#3629 (137712258280062976) Tried 'stats in Testing Grounds/bigwelds-workshop
+2019-04-06 18:26:56.091928 : Owen#3629 (137712258280062976) Tried 'stats in Testing Grounds/bigwelds-workshop
