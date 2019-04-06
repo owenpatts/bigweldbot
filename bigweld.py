@@ -150,7 +150,11 @@ async def on_message(message):
     
     if str(message.channel) in cmd_channels:
         if content.startswith(prefix) and userID != 563856842153918474:
-            biglog(str(datetime.datetime.now()) + " : " + usertag + " (" + str(userID) + ") Tried '" + command + " in @" + message.guild.name + "/#" + message.channel.name + "\n")
+
+            
+            # Creates log message that looks like:
+            # 2019-04-06 18:26:56.091928 : User#1234 (1234567891234) Tried 'stats in @server#channel
+            biglog(str(datetime.datetime.now()) + " : " + usertag + " (" + str(userID) + ") Tried '" + command + " in @" + message.guild.name + "#" + message.channel.name + "\n")
             
             
             
