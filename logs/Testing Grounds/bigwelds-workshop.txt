@@ -1,4 +1,0 @@
-2019-04-06 18:18:32.747381 [Owen#3629] test 1
-2019-04-06 18:18:35.954879 [Owen#3629] wow here's a test
-2019-04-06 18:18:38.492022 [Owen#3629] big judgement
-2019-04-06 18:18:38.737032 [Bigweld#9489] Owen has judged you.
