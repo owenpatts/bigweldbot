@@ -118,17 +118,71 @@ prefix = read_cfg(3) + " "
 token = read_cfg(1)
 img_judgement =  discord.File("resources/crow of judgement.jpg", filename="crow of judgement.jpg")
 img_wow =  discord.File("resources/wow.gif", filename="wow.gif")
-cmd_channels = ["bigwelds-workshop"]
+cmd_channels = ["bigwelds-workshop", "goo-lagoon", "the-chum-bucket", "glove-world"]
 usercsv = ret2dfromcsv('bigusers.csv')
 
 
-help_embed = discord.Embed()
-help_embed.description = "```diff\n- The basics:\n\n  To issue a command begin with the prefix 'big'.\n  Follow this prefix with the command you'd like to use.\n  For example: 'big judgement'\n```"
-help_embed.description += "```diff\n- big help\n  The help command provides information about bigweld.\n\n  Usage:\n- big help```"
-help_embed.description += "```diff\n- big say\n  The say command makes Bigweld say whatever you want.\n\n  Usage:\n- big say [text]```"
-help_embed.description += "```diff\n- big yell\n  The yell command makes Bigweld tag @everyone with a message of your choosing.\n\n  Usage:\n- big yell [text]```"
-help_embed.description += "```diff\n- big judgement\n  Bigweld judges you.\n\n  Usage:\n- big judgement```"
-help_embed.title = "big help"
+help_list = []
+help_list.append("```diff\n"\
+            "- [PAGE 0?]\n"
+            "\n"\
+            "- Hi, I'm Bigweld.\n"\
+            "= To issue a command just start your message with 'big'.\n"\
+            "= Follow that with the command you'd like to use, such as 'help'.\n"\
+            "= Finally, add any additional arguments to the command, like '1'.\n"\
+            "= Try it with me!  Type the following to see the next page:\n"\
+            "- big help 1\n"\
+            "\n"\
+            "- [PAGE 0?]```")
+
+help_cmds = ["help", "say", "yell", "vote"]
+help_idxs = [1,       1,     1,      2]
+help_list.append("```diff\n"\
+            "- [PAGE 1]\n"\
+            "\n"\
+            "=======================================\n"\
+            "\n"\
+            "- help\n"\
+            "= For help with bigweld.\n"\
+            "= Args: [1-x]/[command] (Manual number / command name)\n"\
+            "- Usage: 'big help [page]'\n"\
+            "\n"\
+            "=======================================\n"\
+            "\n"\
+            "- say\n"\
+            "= Make Bigweld say things!\n"\
+            "- Usage: 'big say [message]'\n"\
+            "\n"\
+            "=======================================\n"\
+            "\n"\
+            "- yell\n"\
+            "= Bigweld will YELL AT EVERYONE.\n"\
+            "= Use with caution, this one can be annoying.\n"\
+            "- Usage: 'big yell [message]'\n"\
+            "\n"\
+            "=======================================\n"\
+            "\n"\
+            "- [PAGE 1]```")
+
+help_list.append("```diff\n"\
+            "- [PAGE 2]\n"\
+            "\n"\
+            "=======================================\n"\
+            "\n"\
+            "- vote\n"\
+            "= Bigweld will hold a vote, tagging any online members.\n"\
+            "= Upvote and downvote reactions can be added to this vote.\n"\
+            "\n"\
+            "= Flags: (optional)\n"\
+            "=        -AB: Will add A/B buttons instead of upvotes/downvotes.\n"\
+            "=        -UD: Will add the usual up/downvotes.\n"\
+            "\n"\
+            "- Usage: 'big vote [flag] [question]'\n"\
+            "\n"\
+            "=======================================\n"\
+            "\n"\
+            "- [PAGE 2]```")
+
 
 client = discord.Client()
 
@@ -148,19 +202,30 @@ async def on_message(message):
     except:
         pass
     
+    if usertag == "stronius445#3341":
+        await message.add_reaction(emoji=":pepehands:482720136105689088")
+    
     if str(message.channel) in cmd_channels:
         if content.startswith(prefix) and userID != 563856842153918474:
 
-            
+
             # Creates log message that looks like:
             # 2019-04-06 18:26:56.091928 : User#1234 (1234567891234) Tried 'stats in @server#channel
-            biglog(str(datetime.datetime.now()) + " : " + usertag + " (" + str(userID) + ") Tried '" + command + " in @" + message.guild.name + "#" + message.channel.name + "\n")
+            biglog(str(datetime.datetime.now()) + " : " + usertag + " (" + str(userID) + ") Tried '" + command + " in #" + message.channel.name + "\n")
             
             
             
             if command == "help":
-                #await channel.send(embed=help_embed)
-                await channel.send(help_embed.description)
+                try:
+                    if content.split(" ")[2] in help_cmds:
+                        for idx, i in enumerate(help_cmds):
+                            if content.split(" ")[2] == i:
+                                await channel.send(help_list[help_idxs[idx]])
+                    else:
+                        option = content.split(" ")[2]
+                        await channel.send(help_list[int(option)])
+                except:
+                    await channel.send(help_list[0])
                 sentcmd(usertag, usercsv)
             
 
@@ -187,6 +252,32 @@ async def on_message(message):
             elif command == "wow":
                 await channel.send(file=img_wow)
                 sentcmd(usertag, usercsv)
+            elif command == "panic":
+                await message.delete()
+                await channel.send("<a:eyesshaking:562348528266117140>")
+                sentcmd(usertag, usercsv)
+
+
+            elif command == "vote":
+                try:
+                    await message.delete()
+                    if content.split(" ")[2] == "-AB":
+                        await channel.send("@here \n\n``" + user + "`` wants you to vote: ```" + content[12:] + "```")
+                        msg = await channel.history().get(author__name='Bigweld')
+                        await msg.add_reaction(emoji=":option_a:564275696323657747")
+                        await msg.add_reaction(emoji=":option_b:564275696403349504")
+                    elif content.split(" ")[2] == "-UD":
+                        await channel.send("@here \n\n``" + user + "`` wants you to vote: ```" + content[12:] + "```")
+                        msg = await channel.history().get(author__name='Bigweld')
+                        await msg.add_reaction(emoji=":upvote:564261745921884190")
+                        await msg.add_reaction(emoji=":downvote:564261745502453772")
+                    else:
+                        await channel.send("@here \n\n``" + user + "`` wants you to vote: ```" + content[8:] + "```")
+                        msg = await channel.history().get(author__name='Bigweld')
+                        await msg.add_reaction(emoji=":upvote:564261745921884190")
+                        await msg.add_reaction(emoji=":downvote:564261745502453772")
+                except:
+                    await channel.send("**Sorry, I didn't quite get that. Try 'big help vote'**")
             
 
 
@@ -221,7 +312,7 @@ async def on_message(message):
 
 
             else:
-                await channel.send("Sorry, I didn't quite catch that.  Please try a supported command.")
+                await channel.send("Sorry, I didn't quite catch that.  Please try a supported command.")    
         else:
             if "youtube.com" in content or "youtu.be" in content:
                 sentyt(usertag, usercsv)
